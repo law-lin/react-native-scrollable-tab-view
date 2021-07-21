@@ -1,30 +1,26 @@
 const React = require('react');
 const { Component } = React;
-const { ViewPropTypes } = ReactNative = require('react-native');
-const createReactClass = require('create-react-class');
-const PropTypes = require('prop-types');
-const {
-  Dimensions,
+const { ViewPropTypes,  Dimensions,
   View,
   Animated,
   ScrollView,
   Platform,
   StyleSheet,
-  InteractionManager,
-} = ReactNative;
+  InteractionManager, } = require('react-native');
+const createReactClass = require('create-react-class');
+const PropTypes = require('prop-types');
 
-const ViewPagerAndroid = require('@react-native-community/viewpager');
 const TimerMixin = require('react-timer-mixin');
-const ViewPager = require('@react-native-community/viewpager');
 
 const SceneComponent = require('./SceneComponent');
 const DefaultTabBar = require('./DefaultTabBar');
 const ScrollableTabBar = require('./ScrollableTabBar');
+import PagerView from 'react-native-pager-view'
 
 const AnimatedViewPagerAndroid = Platform.OS === 'android' ?
-  Animated.createAnimatedComponent(ViewPager) :
+  Animated.createAnimatedComponent(PagerView) :
   undefined;
-
+  
 const ScrollableTabView = createReactClass({
   mixins: [TimerMixin, ],
   statics: {
@@ -32,7 +28,6 @@ const ScrollableTabView = createReactClass({
     ScrollableTabBar,
   },
   scrollOnMountCalled: false,
-  tabWillChangeWithoutGesture: false,
 
   propTypes: {
     tabBarPosition: PropTypes.oneOf(['top', 'bottom', 'overlayTop', 'overlayBottom', ]),
@@ -142,7 +137,6 @@ const ScrollableTabView = createReactClass({
       }
     } else {
       if (this.scrollView) {
-        this.tabWillChangeWithoutGesture = true;
         if (this.props.scrollWithoutAnimation) {
           this.scrollView.setPageWithoutAnimation(pageNumber);
         } else {
@@ -252,6 +246,7 @@ const ScrollableTabView = createReactClass({
       </Animated.ScrollView>;
     } else {
       const scenes = this._composeScenes();
+      
       return <AnimatedViewPagerAndroid
         key={this._children().length}
         style={styles.scrollableContentAndroid}
@@ -307,11 +302,10 @@ const ScrollableTabView = createReactClass({
     }
 
     const currentPage = this.state.currentPage;
-    !this.tabWillChangeWithoutGesture && this.updateSceneKeys({
+    this.updateSceneKeys({
       page: localNextPage,
       callback: this._onChangeTab.bind(this, currentPage, localNextPage),
     });
-    this.tabWillChangeWithoutGesture = false;
   },
 
   _onChangeTab(prevPage, currentPage) {
